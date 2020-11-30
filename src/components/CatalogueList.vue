@@ -9,15 +9,11 @@
       </div>
       <div class="list-field">
         <ul class="catalogue" v-if="getLength">
-          <li
-            title="View"
-            v-for="item in catalogue"
-            :key="item.id"
-            class="catalogue-list"
-          >
+          <li v-for="item in catalogue" :key="item.id" class="catalogue-list">
             <router-link
               :to="{ name: 'Details', params: { id: item.id } }"
               class="catalogue-item"
+              title="View"
             >
               <img
                 src="../assets/images/logo.png"
@@ -34,9 +30,7 @@
                 class="btn btn--sm btn--primary mx-1"
                 >View</router-link
               >
-              <router-link
-                :to="{ name: 'Details', params: { id: item.id } }"
-                class="btn btn--sm btn--default mx-1"
+              <router-link to="#" class="btn btn--sm btn--default mx-1"
                 >Edit</router-link
               >
               <button
@@ -86,6 +80,8 @@ export default {
 
     deleteItem(id) {
       this.deleteItemById(id);
+      alert("item deleted");
+      this.getList;
     },
   },
 
