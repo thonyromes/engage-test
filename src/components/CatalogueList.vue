@@ -16,7 +16,7 @@
               title="View"
             >
               <img
-                src="../assets/images/logo.png"
+                :src="item.image"
                 alt="image"
                 class="catalogue-item__image"
               />

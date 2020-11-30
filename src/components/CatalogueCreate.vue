@@ -18,7 +18,7 @@
       </div>
       <div class="upload-field">
         <label for="uploads" class="upload-field__label">Upload Image</label>
-        <input type="file" class="input-field__input" />
+        <input type="file" class="input-field__input" @change="onFileChange" />
       </div>
       <div class="btn-field">
         <button class="btn btn--primary" @click="addItem" type="button">
@@ -59,9 +59,26 @@ export default {
 
       this.addToCatalogue(createItem(this.description, this.image));
       this.description = "";
-      this.image = [];
+      this.image = "";
 
       alert("Item Added");
+    },
+
+    onFileChange(e) {
+      const files = e.target.files || e.dataTransfer.files;
+      if (!files.length) return;
+      this.createImage(files[0]);
+    },
+    createImage(file) {
+      const image = new Image();
+      const reader = new FileReader();
+
+      reader.onload = (e) => {
+        this.image = e.target.result;
+      };
+      reader.readAsDataURL(file);
+
+      console.log(this.image);
     },
   },
 };

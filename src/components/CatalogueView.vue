@@ -59,7 +59,7 @@ export default {
 
   mounted() {
     this.$nextTick(function () {
-      this.getItem();
+      this.getItem;
     });
   },
 };
