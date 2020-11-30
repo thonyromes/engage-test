@@ -47,7 +47,7 @@ export default {
   data() {
     return {
       description: "",
-      images: [],
+      image: "",
     };
   },
 
@@ -57,9 +57,9 @@ export default {
     addItem() {
       // console.log(createItem(this.description, this.images));
 
-      this.addToCatalogue(createItem(this.description, this.images));
+      this.addToCatalogue(createItem(this.description, this.image));
       this.description = "";
-      this.images = [];
+      this.image = [];
 
       alert("Item Added");
     },
