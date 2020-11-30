@@ -1,0 +1,11 @@
+@use './assets/styles/partials/_bootstrap-reboot.min.css';
+
+$bg-color: #333355;
+$text-color: #232333;
+
+body {
+  background-color: $bg-color;
+  color: $text-color;
+  font-family: "Montserrat", sans-serif;
+  font-weight: 300;
+}
