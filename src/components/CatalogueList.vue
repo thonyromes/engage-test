@@ -98,6 +98,7 @@ export default {
     deleteItem(id) {
       this.deleteItemById(id);
       this.getList;
+      this.createImages;
       alert("item deleted");
     },
   },
