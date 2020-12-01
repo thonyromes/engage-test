@@ -8,6 +8,11 @@
         >
       </div>
       <form @submit.prevent="addItem">
+        <ul v-if="errors" class="error">
+          <li v-for="error in errors" :key="error" class="error__text">
+            {{ error }}
+          </li>
+        </ul>
         <div class="input-field">
           <label for="description" class="input-field__label"
             >Description</label
@@ -17,7 +22,6 @@
             id="description"
             class="input-field__input"
             v-model="description"
-            required
           ></textarea>
         </div>
         <div class="upload-field">
@@ -27,7 +31,6 @@
             class="input-field__input"
             @change="onFileChange"
             accept="image/*"
-            required
           />
         </div>
         <div class="upload-preview">
@@ -68,6 +71,7 @@ export default {
       image: null,
       imageSrc: null,
       isAdding: false,
+      errors: [],
 
       // for edits
       routeId: "",
@@ -107,8 +111,20 @@ export default {
     addItem(e) {
       const asynFun = async () => {
         this.isAdding = true;
+        this.errors = [];
 
         try {
+          if (!this.description) {
+            this.errors.push("Description is required");
+          }
+          if (!this.imageSrc) {
+            this.errors.push("Image is required");
+          }
+
+          if (!this.description || !this.imageSrc) {
+            return;
+          }
+
           await this.addToCatalogue(createItem(this.description, this.image));
 
           await ((this.description = ""),
@@ -153,6 +169,9 @@ export default {
       try {
         await this.getRouteId;
         await this.getItem;
+        if (!this.isItemExist) {
+          return;
+        }
         await this.createImageThumb;
       } catch (err) {
         console.log(err);
@@ -281,6 +300,18 @@ $input-shadow: 0 0 0 0.1rem fade-out($shadow-color, 0.5);
 .img {
   &-thumb {
     height: 5rem;
+  }
+}
+
+.error {
+  list-style: none;
+  padding: 0.5rem;
+  margin: 0;
+
+  &__text {
+    color: red;
+    font-size: 0.85rem;
+    font-weight: 500;
   }
 }
 </style>
