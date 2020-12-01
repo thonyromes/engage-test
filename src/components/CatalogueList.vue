@@ -16,7 +16,7 @@
               title="View"
             >
               <img
-                :src="item.image"
+                :src="createImage(item.image)"
                 alt="image"
                 class="catalogue-item__image"
               />
@@ -60,6 +60,7 @@ export default {
   data() {
     return {
       catalogue: [],
+      imageSrc: "",
     };
   },
 
@@ -80,14 +81,26 @@ export default {
 
     deleteItem(id) {
       this.deleteItemById(id);
-      alert("item deleted");
       this.getList;
+      alert("item deleted");
+    },
+
+    createImage(file) {
+      const reader = new FileReader();
+
+      reader.readAsDataURL(file);
+
+      reader.onload = (e) => {
+        return e.target.result;
+      };
     },
   },
 
   mounted() {
     this.$nextTick(function () {
       this.getList;
+
+      console.log(this.catalogue);
     });
   },
 };

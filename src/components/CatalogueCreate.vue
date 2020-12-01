@@ -14,11 +14,26 @@
           id="description"
           class="input-field__input"
           v-model="description"
+          required
         ></textarea>
       </div>
       <div class="upload-field">
         <label for="uploads" class="upload-field__label">Upload Image</label>
-        <input type="file" class="input-field__input" @change="onFileChange" />
+        <input
+          type="file"
+          class="input-field__input"
+          @change="onFileChange"
+          accept="image/*"
+          required
+        />
+      </div>
+      <div class="upload-preview">
+        <img
+          :src="imageSrc"
+          alt="preview"
+          class="img-thumb"
+          v-show="imageSrc"
+        />
       </div>
       <div class="btn-field">
         <button class="btn btn--primary" @click="addItem" type="button">
@@ -34,11 +49,11 @@
 import { v4 as uuidv4 } from "uuid";
 import { mapMutations } from "vuex";
 
-const createItem = (description, images) => ({
+const createItem = (description, image) => ({
   item: {
     id: uuidv4(),
     description,
-    images,
+    image,
   },
 });
 
@@ -47,7 +62,8 @@ export default {
   data() {
     return {
       description: "",
-      image: "",
+      image: null,
+      imageSrc: "",
     };
   },
 
@@ -55,30 +71,32 @@ export default {
     ...mapMutations(["addToCatalogue"]),
 
     addItem() {
-      // console.log(createItem(this.description, this.images));
-
       this.addToCatalogue(createItem(this.description, this.image));
       this.description = "";
-      this.image = "";
+      this.image = null;
+      this.imageSrc = "";
 
       alert("Item Added");
     },
 
     onFileChange(e) {
       const files = e.target.files || e.dataTransfer.files;
+
       if (!files.length) return;
+
+      this.image = files[0];
+
       this.createImage(files[0]);
     },
+
     createImage(file) {
-      const image = new Image();
       const reader = new FileReader();
 
-      reader.onload = (e) => {
-        this.image = e.target.result;
-      };
       reader.readAsDataURL(file);
 
-      console.log(this.image);
+      reader.onload = (e) => {
+        this.imageSrc = e.target.result;
+      };
     },
   },
 };
@@ -187,6 +205,16 @@ $input-shadow: 0 0 0 0.1rem fade-out($shadow-color, 0.5);
   &--default {
     color: $text-color;
     background-color: fade-out(black, 0.95);
+  }
+}
+
+.upload-preview {
+  padding: 0.5rem;
+}
+
+.img {
+  &-thumb {
+    height: 5rem;
   }
 }
 </style>
