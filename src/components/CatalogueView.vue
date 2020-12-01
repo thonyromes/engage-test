@@ -10,11 +10,7 @@
       <div class="list-field">
         <div class="catalogue-view" v-if="isItemExist">
           <div class="align-center">
-            <img
-              src="../assets/images/logo.png"
-              alt="image"
-              class="catalogue-view__image"
-            />
+            <img :src="imageSrc" alt="image" class="catalogue-view__image" />
           </div>
           <p class="catalogue-view__desc">
             {{ catalogueItem.description }}
@@ -36,8 +32,9 @@ export default {
 
   data() {
     return {
+      routeId: "",
       catalogueItem: null,
-      id: "",
+      imageSrc: null,
     };
   },
 
@@ -45,22 +42,40 @@ export default {
     ...mapGetters(["getCatalogueById"]),
 
     getItem() {
-      this.catalogueItem = this.getCatalogueById(this.id);
+      this.catalogueItem = this.getCatalogueById(this.routeId);
     },
 
     isItemExist() {
-      return this.catalogueItem;
+      return this.catalogueItem ? true : false;
+    },
+
+    getRouteId() {
+      this.routeId = this.$route.params.id;
+    },
+
+    createImage() {
+      const reader = new FileReader();
+
+      reader.readAsDataURL(this.catalogueItem.image);
+
+      reader.onload = (e) => {
+        this.imageSrc = e.target.result;
+      };
     },
   },
 
   created() {
-    this.id = this.$route.params.id;
-  },
+    const asyncFun = async () => {
+      try {
+        await this.getRouteId;
+        await this.getItem;
+        await this.createImage;
+      } catch (err) {
+        console.log(err);
+      }
+    };
 
-  mounted() {
-    this.$nextTick(function () {
-      this.getItem;
-    });
+    asyncFun();
   },
 };
 </script>

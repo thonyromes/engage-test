@@ -36,6 +36,7 @@
               <button
                 type="button"
                 class="btn btn--sm btn--danger mx-1"
+                :disabled="isDeleting"
                 @click="deleteItem(item.id)"
               >
                 Delete
@@ -61,6 +62,7 @@ export default {
     return {
       catalogue: [],
       imageSrc: {},
+      isDeleting: false,
     };
   },
 
@@ -94,16 +96,35 @@ export default {
     ...mapMutations(["deleteItemById"]),
 
     deleteItem(id) {
-      this.deleteItemById(id);
-      this.getList;
-      this.createImages;
-      alert("item deleted");
+      const asyncFun = async () => {
+        this.isDeleting = true;
+        try {
+          await this.deleteItemById(id);
+          await this.getList;
+          await this.createImages;
+          await alert("item deleted");
+        } catch (err) {
+          console.log(err);
+        } finally {
+          await (this.isDeleting = false);
+        }
+      };
+
+      asyncFun();
     },
   },
 
   created() {
-    this.getList;
-    this.createImages;
+    const asyncFun = async () => {
+      try {
+        await this.getList;
+        await this.createImages;
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    asyncFun();
   },
 };
 </script>

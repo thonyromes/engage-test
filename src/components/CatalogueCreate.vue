@@ -36,7 +36,12 @@
         />
       </div>
       <div class="btn-field">
-        <button class="btn btn--primary" @click="addItem" type="button">
+        <button
+          class="btn btn--primary"
+          :disabled="isAdding"
+          @click="addItem"
+          type="button"
+        >
           Add to Catalogue
         </button>
       </div>
@@ -64,6 +69,7 @@ export default {
       description: "",
       image: null,
       imageSrc: null,
+      isAdding: false,
     };
   },
 
@@ -71,12 +77,25 @@ export default {
     ...mapMutations(["addToCatalogue"]),
 
     addItem() {
-      this.addToCatalogue(createItem(this.description, this.image));
-      this.description = "";
-      this.image = null;
-      this.imageSrc = null;
+      const asynFun = async () => {
+        this.isAdding = true;
 
-      alert("Item Added");
+        try {
+          await this.addToCatalogue(createItem(this.description, this.image));
+
+          await ((this.description = ""),
+          (this.image = null),
+          (this.imageSrc = null));
+
+          await alert("Item Added");
+        } catch (err) {
+          console.log(err);
+        } finally {
+          await (this.isAdding = false);
+        }
+      };
+
+      asynFun();
     },
 
     onFileChange(e) {
@@ -206,10 +225,14 @@ $input-shadow: 0 0 0 0.1rem fade-out($shadow-color, 0.5);
     color: $text-color;
     background-color: fade-out(black, 0.95);
   }
+
+  &[disabled] {
+    opacity: 0.5;
+  }
 }
 
 .upload-preview {
-  padding: 0.5rem;
+  padding: 0.75rem;
 }
 
 .img {
