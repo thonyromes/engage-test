@@ -187,11 +187,19 @@ export default {
     },
 
     onFileChange(e) {
+      const errMsg = "Image is too large (less than 3MB)";
+      this.errors = this.errors.filter((val) => val !== errMsg);
+
       const files = e.target.files || e.dataTransfer.files;
 
-      console.log(files);
-
       if (!files.length) return;
+
+      const maxSize = files[0].size / 1048576;
+
+      if (maxSize > 3) {
+        this.errors.push(errMsg);
+        return;
+      }
 
       this.image = files[0];
 
