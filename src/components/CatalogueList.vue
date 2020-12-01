@@ -9,18 +9,14 @@
       </div>
       <div class="list-field">
         <ul class="catalogue" v-if="getLength">
-          <li
-            v-for="(item, index) in catalogue"
-            :key="item.id"
-            class="catalogue-list"
-          >
+          <li v-for="item in catalogue" :key="item.id" class="catalogue-list">
             <router-link
               :to="{ name: 'Details', params: { id: item.id } }"
               class="catalogue-item"
               title="View"
             >
               <img
-                :src="imageSrc[index]"
+                :src="imageSrc[item.id]"
                 alt="image"
                 class="catalogue-item__image"
               />
@@ -64,7 +60,7 @@ export default {
   data() {
     return {
       catalogue: [],
-      imageSrc: [],
+      imageSrc: {},
     };
   },
 
@@ -80,13 +76,13 @@ export default {
     },
 
     createImages() {
-      this.catalogue.map((val, i) => {
+      this.catalogue.map((val) => {
         const reader = new FileReader();
 
         reader.readAsDataURL(val.image);
 
         reader.onload = (e) => {
-          this.imageSrc[i] = e.target.result;
+          this.imageSrc[val.id] = e.target.result;
         };
       });
     },
@@ -100,6 +96,8 @@ export default {
       this.getList;
       this.createImages;
       alert("item deleted");
+
+      console.log(this.imageSrc);
     },
   },
 
