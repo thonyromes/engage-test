@@ -9,14 +9,18 @@
       </div>
       <div class="list-field">
         <ul class="catalogue" v-if="getLength">
-          <li v-for="item in catalogue" :key="item.id" class="catalogue-list">
+          <li
+            v-for="(item, index) in catalogue"
+            :key="item.id"
+            class="catalogue-list"
+          >
             <router-link
               :to="{ name: 'Details', params: { id: item.id } }"
               class="catalogue-item"
               title="View"
             >
               <img
-                :src="createImage(item.image)"
+                :src="imageSrc[index]"
                 alt="image"
                 class="catalogue-item__image"
               />
@@ -60,7 +64,7 @@ export default {
   data() {
     return {
       catalogue: [],
-      imageSrc: "",
+      imageSrc: [],
     };
   },
 
@@ -74,6 +78,18 @@ export default {
     getList() {
       this.catalogue = this.getCatalogue;
     },
+
+    createImages() {
+      this.catalogue.map((val, i) => {
+        const reader = new FileReader();
+
+        reader.readAsDataURL(val.image);
+
+        reader.onload = (e) => {
+          this.imageSrc[i] = e.target.result;
+        };
+      });
+    },
   },
 
   methods: {
@@ -84,24 +100,11 @@ export default {
       this.getList;
       alert("item deleted");
     },
-
-    createImage(file) {
-      const reader = new FileReader();
-
-      reader.readAsDataURL(file);
-
-      reader.onload = (e) => {
-        return e.target.result;
-      };
-    },
   },
 
-  mounted() {
-    this.$nextTick(function () {
-      this.getList;
-
-      console.log(this.catalogue);
-    });
+  created() {
+    this.getList;
+    this.createImages;
   },
 };
 </script>
@@ -210,9 +213,7 @@ $box-shadow: 0 8px 6px 0 fade-out($border-color, 0.95);
     text-decoration: none;
 
     &__image {
-      width: 3rem;
-      height: 3rem;
-      object-fit: cover;
+      width: 5rem;
     }
     &__desc {
       margin-left: 0.5rem;
