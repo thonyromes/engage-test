@@ -50,7 +50,7 @@
 
 <script>
 import { v4 as uuidv4 } from "uuid";
-import { mapMutations } from "vuex";
+import { mapGetters, mapMutations } from "vuex";
 
 const createItem = (description, image) => ({
   item: {
@@ -68,7 +68,37 @@ export default {
       image: null,
       imageSrc: null,
       isAdding: false,
+
+      // for edits
+      routeId: "",
+      catalogueItem: null,
     };
+  },
+
+  computed: {
+    ...mapGetters(["getCatalogueById"]),
+
+    getItem() {
+      this.catalogueItem = this.getCatalogueById(this.routeId);
+    },
+
+    isItemExist() {
+      return this.catalogueItem ? true : false;
+    },
+
+    getRouteId() {
+      this.routeId = this.$route.params.id;
+    },
+
+    createImageThumb() {
+      const reader = new FileReader();
+
+      reader.readAsDataURL(this.catalogueItem.image);
+
+      reader.onload = (e) => {
+        this.imageSrc = e.target.result;
+      };
+    },
   },
 
   methods: {
@@ -116,6 +146,20 @@ export default {
         this.imageSrc = e.target.result;
       };
     },
+  },
+
+  created() {
+    const asyncFun = async () => {
+      try {
+        await this.getRouteId;
+        await this.getItem;
+        await this.createImageThumb;
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    asyncFun();
   },
 };
 </script>

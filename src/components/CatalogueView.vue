@@ -69,6 +69,10 @@ export default {
       try {
         await this.getRouteId;
         await this.getItem;
+        if (!this.isItemExist) {
+          this.$router.push("/error/404");
+          return;
+        }
         await this.createImage;
       } catch (err) {
         console.log(err);
