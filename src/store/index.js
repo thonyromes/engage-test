@@ -34,13 +34,25 @@ const store = createStore({
       tempCatalogue.push(payload.item);
 
       state.catalogue = tempCatalogue;
+
     },
 
     deleteItemById(state, id) {
       const tempCatalogue = state.catalogue;
 
       state.catalogue = tempCatalogue.filter(item => item.id !== id);
-    }
+    },
+
+    updateInCatalogue(state, payload) {
+      const tempCatalogue = state.catalogue.map((val) => (
+        val.id === payload.item.id 
+        ? {...val, description: payload.item.description, image: payload.item.image} 
+        : val
+      ));
+
+      state.catalogue = tempCatalogue;
+
+    },
   }
 
 })

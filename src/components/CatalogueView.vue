@@ -162,7 +162,7 @@ $box-shadow: 0 8px 6px 0 fade-out($border-color, 0.95);
 
     &__image {
       max-width: 100%;
-      width: 10rem;
+      width: 15rem;
     }
 
     &__desc {

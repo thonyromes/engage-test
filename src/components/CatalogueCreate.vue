@@ -7,7 +7,7 @@
           >View Catalogue</router-link
         >
       </div>
-      <form @submit.prevent="addItem">
+      <form @submit.prevent="saveItem">
         <ul v-if="errors" class="error">
           <li v-for="error in errors" :key="error" class="error__text">
             {{ error }}
@@ -25,13 +25,22 @@
           ></textarea>
         </div>
         <div class="upload-field">
-          <label for="uploads" class="upload-field__label">Upload Image</label>
+          <label class="upload-field__label">Upload Image</label>
           <input
             type="file"
-            class="input-field__input"
+            id="uploads"
+            class="input-field__input invisible"
             @change="onFileChange"
             accept="image/*"
           />
+          <label
+            for="uploads"
+            class="input-file-label"
+            @dragenter.stop.prevent
+            @dragover.stop.prevent
+            @drop.stop.prevent="onFileChange"
+            ><strong>Click here</strong> or Drop Image to upload</label
+          >
         </div>
         <div class="upload-preview">
           <img
@@ -42,8 +51,21 @@
           />
         </div>
         <div class="btn-field">
-          <button class="btn btn--primary" :disabled="isAdding" type="submit">
+          <button
+            class="btn btn--primary"
+            :disabled="isSaving"
+            type="submit"
+            v-if="!isEditing"
+          >
             Add to Catalogue
+          </button>
+          <button
+            class="btn btn--primary"
+            :disabled="isSaving"
+            type="submit"
+            v-else
+          >
+            Update in Catalogue
           </button>
         </div>
       </form>
@@ -55,9 +77,9 @@
 import { v4 as uuidv4 } from "uuid";
 import { mapGetters, mapMutations } from "vuex";
 
-const createItem = (description, image) => ({
+const createItem = (description, image, id = null) => ({
   item: {
-    id: uuidv4(),
+    id: id || uuidv4(),
     description,
     image,
   },
@@ -70,6 +92,7 @@ export default {
       description: "",
       image: null,
       imageSrc: null,
+      isSaving: false,
       isAdding: false,
       errors: [],
 
@@ -86,12 +109,24 @@ export default {
       this.catalogueItem = this.getCatalogueById(this.routeId);
     },
 
+    getRouteId() {
+      this.routeId = this.$route.params.id;
+    },
+
+    isEditing() {
+      return this.routeId ? true : false;
+    },
+
     isItemExist() {
       return this.catalogueItem ? true : false;
     },
 
-    getRouteId() {
-      this.routeId = this.$route.params.id;
+    setDescription() {
+      this.description = this.catalogueItem.description;
+    },
+
+    setImage() {
+      this.image = this.catalogueItem.image;
     },
 
     createImageThumb() {
@@ -106,37 +141,45 @@ export default {
   },
 
   methods: {
-    ...mapMutations(["addToCatalogue"]),
+    ...mapMutations(["addToCatalogue", "updateInCatalogue"]),
 
-    addItem(e) {
+    saveItem(e) {
       const asynFun = async () => {
-        this.isAdding = true;
+        this.isSaving = true;
         this.errors = [];
 
         try {
           if (!this.description) {
             this.errors.push("Description is required");
           }
+
           if (!this.imageSrc) {
             this.errors.push("Image is required");
           }
 
-          if (!this.description || !this.imageSrc) {
+          if (this.errors.length > 0) {
             return;
           }
 
-          await this.addToCatalogue(createItem(this.description, this.image));
+          if (!this.isEditing) {
+            await this.addToCatalogue(createItem(this.description, this.image));
 
-          await ((this.description = ""),
-          (this.image = null),
-          (this.imageSrc = null),
-          e.target.reset());
+            await ((this.description = ""),
+            (this.image = null),
+            (this.imageSrc = null),
+            e.target.reset());
 
-          await alert("Item Added");
+            await alert("Item Added");
+          } else {
+            await this.updateInCatalogue(
+              createItem(this.description, this.image, this.catalogueItem.id)
+            );
+            await alert("Item Updated");
+          }
         } catch (err) {
           console.log(err);
         } finally {
-          await (this.isAdding = false);
+          await (this.isSaving = false);
         }
       };
 
@@ -145,6 +188,8 @@ export default {
 
     onFileChange(e) {
       const files = e.target.files || e.dataTransfer.files;
+
+      console.log(files);
 
       if (!files.length) return;
 
@@ -173,6 +218,8 @@ export default {
           return;
         }
         await this.createImageThumb;
+        await this.setDescription;
+        await this.setImage;
       } catch (err) {
         console.log(err);
       }
@@ -250,7 +297,7 @@ $input-shadow: 0 0 0 0.1rem fade-out($shadow-color, 0.5);
 }
 
 .btn-field {
-  padding: 0.5rem 1rem;
+  padding: 1rem;
   text-align: center;
 }
 
@@ -294,7 +341,7 @@ $input-shadow: 0 0 0 0.1rem fade-out($shadow-color, 0.5);
 }
 
 .upload-preview {
-  padding: 0.75rem;
+  padding: 0.75rem 1.5rem;
 }
 
 .img {
@@ -313,5 +360,25 @@ $input-shadow: 0 0 0 0.1rem fade-out($shadow-color, 0.5);
     font-size: 0.85rem;
     font-weight: 500;
   }
+}
+
+.invisible {
+  position: absolute !important;
+  height: 1px;
+  width: 1px;
+  overflow: hidden;
+  clip: rect(1px, 1px, 1px, 1px);
+}
+
+.input-file-label {
+  min-height: 5rem;
+  display: inline-block;
+  width: 100%;
+  border: 1px dashed fade-out($border-color, 0.8);
+  font-weight: 500;
+  padding: 0.5rem;
+  font-size: 0.85rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
 }
 </style>
