@@ -7,45 +7,43 @@
           >View Catalogue</router-link
         >
       </div>
-      <div class="input-field">
-        <label for="description" class="input-field__label">Description</label>
-        <textarea
-          name="description"
-          id="description"
-          class="input-field__input"
-          v-model="description"
-          required
-        ></textarea>
-      </div>
-      <div class="upload-field">
-        <label for="uploads" class="upload-field__label">Upload Image</label>
-        <input
-          type="file"
-          class="input-field__input"
-          @change="onFileChange"
-          accept="image/*"
-          required
-        />
-      </div>
-      <div class="upload-preview">
-        <img
-          :src="imageSrc"
-          alt="preview"
-          class="img-thumb"
-          v-show="imageSrc"
-        />
-      </div>
-      <div class="btn-field">
-        <button
-          class="btn btn--primary"
-          :disabled="isAdding"
-          @click="addItem"
-          type="button"
-        >
-          Add to Catalogue
-        </button>
-      </div>
-      <!-- <div class="test-result">{{ description }}</div> -->
+      <form @submit.prevent="addItem">
+        <div class="input-field">
+          <label for="description" class="input-field__label"
+            >Description</label
+          >
+          <textarea
+            name="description"
+            id="description"
+            class="input-field__input"
+            v-model="description"
+            required
+          ></textarea>
+        </div>
+        <div class="upload-field">
+          <label for="uploads" class="upload-field__label">Upload Image</label>
+          <input
+            type="file"
+            class="input-field__input"
+            @change="onFileChange"
+            accept="image/*"
+            required
+          />
+        </div>
+        <div class="upload-preview">
+          <img
+            :src="imageSrc"
+            alt="preview"
+            class="img-thumb"
+            v-show="imageSrc"
+          />
+        </div>
+        <div class="btn-field">
+          <button class="btn btn--primary" :disabled="isAdding" type="submit">
+            Add to Catalogue
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 </template>
@@ -76,7 +74,7 @@ export default {
   methods: {
     ...mapMutations(["addToCatalogue"]),
 
-    addItem() {
+    addItem(e) {
       const asynFun = async () => {
         this.isAdding = true;
 
@@ -85,7 +83,8 @@ export default {
 
           await ((this.description = ""),
           (this.image = null),
-          (this.imageSrc = null));
+          (this.imageSrc = null),
+          e.target.reset());
 
           await alert("Item Added");
         } catch (err) {
