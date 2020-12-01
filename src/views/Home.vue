@@ -19,8 +19,7 @@ export default {
 
 <style lang="scss" scoped>
 .box {
-  max-width: 50rem;
-  width: 90%;
+  max-width: 95%;
 
   &--center {
     margin: 5rem auto;

@@ -102,6 +102,11 @@ $box-shadow: 0 8px 6px 0 fade-out($border-color, 0.95);
   transition: $prop 0.25s ease-in-out;
 }
 
+img {
+  max-width: 100%;
+  height: auto;
+}
+
 .card {
   background-color: $card-bg;
   box-shadow: 3px 3px 6px 0 fade-out($border-color, 0.95);

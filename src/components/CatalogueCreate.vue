@@ -1,74 +1,141 @@
 <template>
-  <div class="card">
-    <h3 class="card__title">Add Catalogue Item</h3>
-    <div class="card__body">
-      <div class="heading-field">
-        <router-link :to="{ name: 'List' }" class="btn btn--sm btn--default"
-          >View Catalogue</router-link
-        >
+  <div class="card-container">
+    <div class="card card-create">
+      <h3 class="card__title">Add Catalogue Item</h3>
+      <div class="card__body">
+        <div class="heading-field">
+          <router-link :to="{ name: 'List' }" class="btn btn--sm btn--default"
+            >View Catalogue</router-link
+          >
+        </div>
+        <div class="input-area">
+          <div class="input-area__fields">
+            <form @submit.prevent="saveItem">
+              <ul v-if="errors" class="error">
+                <li v-for="error in errors" :key="error" class="error__text">
+                  {{ error }}
+                </li>
+              </ul>
+              <div class="input-field">
+                <label for="description" class="input-field__label"
+                  >Description Text</label
+                >
+                <textarea
+                  name="description"
+                  id="description"
+                  class="input-field__input"
+                  v-model="description"
+                ></textarea>
+              </div>
+              <div class="upload-field">
+                <label class="upload-field__label">Upload Image</label>
+                <input
+                  type="file"
+                  id="uploads"
+                  class="input-field__input invisible"
+                  @change="onFileChange"
+                  accept="image/*"
+                />
+                <label
+                  for="uploads"
+                  class="input-file-label"
+                  @dragenter.stop.prevent
+                  @dragover.stop.prevent
+                  @drop.stop.prevent="onFileChange"
+                  ><strong>Click here</strong> or Drop Image to upload</label
+                >
+              </div>
+              <div class="upload-preview">
+                <img
+                  :src="imageSrc"
+                  alt="preview"
+                  class="img-thumb"
+                  v-show="imageSrc"
+                />
+              </div>
+              <div class="btn-field">
+                <button
+                  class="btn btn--primary"
+                  :disabled="isSaving"
+                  type="submit"
+                  v-if="!isEditing"
+                >
+                  Add to Catalogue
+                </button>
+                <button
+                  class="btn btn--primary"
+                  :disabled="isSaving"
+                  type="submit"
+                  v-else
+                >
+                  Update in Catalogue
+                </button>
+              </div>
+            </form>
+          </div>
+          <div class="input-area__options">
+            <div class="input-field">
+              <label for="textcolor" class="input-field__label"
+                >Text Color</label
+              >
+              <input
+                type="text"
+                name="textcolor"
+                id="textcolor"
+                class="input-field__input"
+                placeholder="Enter color (e.g black, red)"
+                v-model="textcolor"
+              />
+            </div>
+            <div class="input-field">
+              <label for="fontsize" class="input-field__label"
+                >Text Font size</label
+              >
+              <input
+                type="number"
+                name="fontsize"
+                id="fontsize"
+                class="input-field__input"
+                placeholder="16"
+                v-model="fontsize"
+                min="1"
+              />
+            </div>
+            <div class="input-field">
+              <label for="imagewidth" class="input-field__label"
+                >Image width</label
+              >
+              <input
+                type="number"
+                name="imagewidth"
+                id="imagewidth"
+                class="input-field__input"
+                placeholder="100"
+                v-model="imagewidth"
+              />
+            </div>
+          </div>
+        </div>
       </div>
-      <form @submit.prevent="saveItem">
-        <ul v-if="errors" class="error">
-          <li v-for="error in errors" :key="error" class="error__text">
-            {{ error }}
-          </li>
-        </ul>
-        <div class="input-field">
-          <label for="description" class="input-field__label"
-            >Description</label
-          >
-          <textarea
-            name="description"
-            id="description"
-            class="input-field__input"
-            v-model="description"
-          ></textarea>
+    </div>
+    <div class="card card-preview">
+      <h3 class="card__title">Preview</h3>
+      <div class="card__body">
+        <div
+          :style="{ color: textcolor, fontSize: fontsize + 'px' }"
+          class="preview-text"
+        >
+          {{ description }}
         </div>
-        <div class="upload-field">
-          <label class="upload-field__label">Upload Image</label>
-          <input
-            type="file"
-            id="uploads"
-            class="input-field__input invisible"
-            @change="onFileChange"
-            accept="image/*"
-          />
-          <label
-            for="uploads"
-            class="input-file-label"
-            @dragenter.stop.prevent
-            @dragover.stop.prevent
-            @drop.stop.prevent="onFileChange"
-            ><strong>Click here</strong> or Drop Image to upload</label
-          >
-        </div>
-        <div class="upload-preview">
+        <div class="preview-image">
           <img
+            :style="{ width: imagewidth + 'px' }"
             :src="imageSrc"
             alt="preview"
-            class="img-thumb"
             v-show="imageSrc"
           />
         </div>
-        <div class="btn-field">
-          <button
-            class="btn btn--primary"
-            :disabled="isSaving"
-            type="submit"
-            v-if="!isEditing"
-          >
-            Add to Catalogue
-          </button>
-          <button
-            class="btn btn--primary"
-            :disabled="isSaving"
-            type="submit"
-            v-else
-          >
-            Update in Catalogue
-          </button>
-        </div>
-      </form>
+      </div>
     </div>
   </div>
 </template>
@@ -99,6 +166,11 @@ export default {
       // for edits
       routeId: "",
       catalogueItem: null,
+
+      // for options
+      textcolor: "black",
+      fontsize: 16,
+      imagewidth: 100,
     };
   },
 
@@ -253,10 +325,44 @@ $input-shadow: 0 0 0 0.1rem fade-out($shadow-color, 0.5);
   transition: $prop 0.25s ease-in-out;
 }
 
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+.card-container {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
 .card {
   background-color: $card-bg;
   box-shadow: 3px 3px 6px 0 fade-out($border-color, 0.95);
   border-radius: 0.25rem;
+
+  &-create {
+    width: 100%;
+    flex: 0 0 100%;
+    margin-bottom: 2rem;
+
+    @media screen and (min-width: 768px) {
+      width: 55%;
+      flex: 0 0 60%;
+      margin-bottom: 0;
+    }
+  }
+
+  &-preview {
+    width: 100%;
+    flex: 0 0 100%;
+
+    @media screen and (min-width: 768px) {
+      width: 35%;
+      flex: 0 0 35%;
+    }
+  }
 
   &__title {
     background-color: fade-out($card-title-bg, 0.99);
@@ -388,5 +494,34 @@ $input-shadow: 0 0 0 0.1rem fade-out($shadow-color, 0.5);
   font-size: 0.85rem;
   border-radius: 0.25rem;
   cursor: pointer;
+}
+
+.input-area {
+  display: flex;
+  justify-content: space-between;
+
+  &__fields {
+    width: auto;
+    flex: 1 1 auto;
+  }
+
+  &__options {
+    width: 30%;
+    flex: 0 0 30%;
+    margin-top: 1rem;
+
+    font-size: 0.75rem;
+  }
+}
+
+.card-preview {
+  .card__body {
+    padding: 1rem;
+  }
+}
+
+.preview-image {
+  padding: 1rem;
+  text-align: center;
 }
 </style>
