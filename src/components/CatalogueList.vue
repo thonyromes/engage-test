@@ -30,7 +30,9 @@
                 class="btn btn--sm btn--primary mx-1"
                 >View</router-link
               >
-              <router-link to="#" class="btn btn--sm btn--default mx-1"
+              <router-link
+                :to="{ name: 'Home', params: { id: item.id } }"
+                class="btn btn--sm btn--default mx-1"
                 >Edit</router-link
               >
               <button
