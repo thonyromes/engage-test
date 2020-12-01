@@ -63,7 +63,7 @@ export default {
     return {
       description: "",
       image: null,
-      imageSrc: "",
+      imageSrc: null,
     };
   },
 
@@ -74,7 +74,7 @@ export default {
       this.addToCatalogue(createItem(this.description, this.image));
       this.description = "";
       this.image = null;
-      this.imageSrc = "";
+      this.imageSrc = null;
 
       alert("Item Added");
     },

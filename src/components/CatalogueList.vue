@@ -76,6 +76,8 @@ export default {
     },
 
     createImages() {
+      this.imageSrc = {};
+
       this.catalogue.map((val) => {
         const reader = new FileReader();
 
@@ -96,8 +98,6 @@ export default {
       this.getList;
       this.createImages;
       alert("item deleted");
-
-      console.log(this.imageSrc);
     },
   },
 
