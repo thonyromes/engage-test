@@ -8,22 +8,29 @@
         >
       </div>
       <div class="list-field">
-        <ul class="catalogue" v-if="getLength">
+        <ul class="catalogue" v-if="getLength > 0">
           <li v-for="item in catalogue" :key="item.id" class="catalogue-list">
-            <router-link
-              :to="{ name: 'Details', params: { id: item.id } }"
-              class="catalogue-item"
-              title="View"
-            >
-              <img
-                :src="imageSrc[item.id]"
-                alt="image"
-                class="catalogue-item__image"
-              />
-              <p class="catalogue-item__desc">
-                {{ item.description }}
-              </p>
-            </router-link>
+            <div class="ouput">
+              <router-link
+                :to="{ name: 'Details', params: { id: item.id } }"
+                class="catalogue-item"
+                title="View"
+              >
+                <img
+                  :src="imageSrc[item.id]"
+                  alt="image"
+                  class="catalogue-item__image"
+                />
+                <p
+                  class="catalogue-item__desc"
+                  :style="{
+                    color: item.desc.textColor,
+                  }"
+                >
+                  {{ item.desc.description }}
+                </p>
+              </router-link>
+            </div>
             <div class="operations">
               <router-link
                 :to="{ name: 'Details', params: { id: item.id } }"
@@ -85,7 +92,7 @@ export default {
       this.catalogue.map((val) => {
         const reader = new FileReader();
 
-        reader.readAsDataURL(val.image);
+        reader.readAsDataURL(val.img.image);
 
         reader.onload = (e) => {
           this.imageSrc[val.id] = e.target.result;
@@ -226,11 +233,29 @@ img {
     padding: 0.5rem;
     border-bottom: 1px solid fade-out($border-color, 0.95);
     margin-bottom: 0.5rem;
-
+    display: flex;
     @include transition(box-shadow);
 
     &:hover {
       box-shadow: $box-shadow;
+    }
+
+    .output {
+      flex: 1 1 auto;
+      width: auto;
+    }
+
+    .operations {
+      flex: 0 0 6rem;
+      width: 6rem;
+      margin-left: auto;
+      text-align: center;
+
+      .btn {
+        display: inline-block;
+        width: 100%;
+        margin: 0.15rem 0;
+      }
     }
   }
 
@@ -240,9 +265,16 @@ img {
     text-decoration: none;
 
     &__image {
-      width: 5rem;
+      width: 6rem;
+      flex: 0 0 6rem;
+      height: 6rem;
+      border-radius: 0.25rem;
+      object-fit: cover;
+      object-position: top;
     }
     &__desc {
+      width: auto;
+      flex: 1 1 auto;
       margin-left: 0.5rem;
       font-size: 0.85rem;
       white-space: nowrap;
@@ -250,11 +282,6 @@ img {
       overflow: hidden;
     }
   }
-}
-
-.operations {
-  padding: 0.5rem;
-  text-align: right;
 }
 
 .mx-1 {

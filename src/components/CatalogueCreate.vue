@@ -22,6 +22,7 @@
                 >
                 <textarea
                   name="description"
+                  placeholder="Enter new text"
                   id="description"
                   class="input-field__input"
                   v-model="description"
@@ -75,43 +76,43 @@
           </div>
           <div class="input-area__options">
             <div class="input-field">
-              <label for="textcolor" class="input-field__label"
+              <label for="textColor" class="input-field__label"
                 >Text Color</label
               >
               <input
                 type="text"
-                name="textcolor"
-                id="textcolor"
+                name="textColor"
+                id="textColor"
                 class="input-field__input"
                 placeholder="Enter color (e.g black, red)"
-                v-model="textcolor"
+                v-model="textColor"
               />
             </div>
             <div class="input-field">
-              <label for="fontsize" class="input-field__label"
+              <label for="fontSize" class="input-field__label"
                 >Text Font size</label
               >
               <input
                 type="number"
-                name="fontsize"
-                id="fontsize"
+                name="fontSize"
+                id="fontSize"
                 class="input-field__input"
                 placeholder="16"
-                v-model="fontsize"
+                v-model="fontSize"
                 min="1"
               />
             </div>
             <div class="input-field">
-              <label for="imagewidth" class="input-field__label"
+              <label for="imageWidth" class="input-field__label"
                 >Image width</label
               >
               <input
                 type="number"
-                name="imagewidth"
-                id="imagewidth"
+                name="imageWidth"
+                id="imageWidth"
                 class="input-field__input"
                 placeholder="100"
-                v-model="imagewidth"
+                v-model="imageWidth"
               />
             </div>
           </div>
@@ -122,14 +123,14 @@
       <h3 class="card__title">Preview</h3>
       <div class="card__body">
         <div
-          :style="{ color: textcolor, fontSize: fontsize + 'px' }"
+          :style="{ color: textColor, fontSize: fontSize + 'px' }"
           class="preview-text"
         >
           {{ description }}
         </div>
         <div class="preview-image">
           <img
-            :style="{ width: imagewidth + 'px' }"
+            :style="{ width: imageWidth + 'px' }"
             :src="imageSrc"
             alt="preview"
             v-show="imageSrc"
@@ -144,11 +145,25 @@
 import { v4 as uuidv4 } from "uuid";
 import { mapGetters, mapMutations } from "vuex";
 
-const createItem = (description, image, id = null) => ({
+const createItem = (
+  description,
+  image,
+  textColor,
+  fontSize,
+  imageWidth,
+  id = null
+) => ({
   item: {
     id: id || uuidv4(),
-    description,
-    image,
+    desc: {
+      description,
+      textColor,
+      fontSize,
+    },
+    img: {
+      image,
+      imageWidth,
+    },
   },
 });
 
@@ -156,7 +171,7 @@ export default {
   name: "CatalogueCreate",
   data() {
     return {
-      description: "",
+      description: "Try typing here...",
       image: null,
       imageSrc: null,
       isSaving: false,
@@ -168,9 +183,9 @@ export default {
       catalogueItem: null,
 
       // for options
-      textcolor: "black",
-      fontsize: 16,
-      imagewidth: 100,
+      textColor: "red",
+      fontSize: 16,
+      imageWidth: 100,
     };
   },
 
@@ -194,26 +209,29 @@ export default {
     },
 
     setDescription() {
-      this.description = this.catalogueItem.description;
+      this.description = this.catalogueItem.desc.description;
     },
 
     setImage() {
-      this.image = this.catalogueItem.image;
+      this.image = this.catalogueItem.img.image;
     },
 
-    createImageThumb() {
-      const reader = new FileReader();
-
-      reader.readAsDataURL(this.catalogueItem.image);
-
-      reader.onload = (e) => {
-        this.imageSrc = e.target.result;
-      };
+    setOptions() {
+      this.textColor = this.catalogueItem.desc.textColor;
+      this.fontSize = this.catalogueItem.desc.fontSize;
+      this.imageWidth = this.catalogueItem.img.imageWidth;
     },
   },
 
   methods: {
     ...mapMutations(["addToCatalogue", "updateInCatalogue"]),
+
+    clearFields(form) {
+      this.description = "";
+      this.image = null;
+      this.imageSrc = null;
+      form.target.reset();
+    },
 
     saveItem(e) {
       const asynFun = async () => {
@@ -234,17 +252,29 @@ export default {
           }
 
           if (!this.isEditing) {
-            await this.addToCatalogue(createItem(this.description, this.image));
+            await this.addToCatalogue(
+              createItem(
+                this.description,
+                this.image,
+                this.textColor,
+                this.fontSize,
+                this.imageWidth
+              )
+            );
 
-            await ((this.description = ""),
-            (this.image = null),
-            (this.imageSrc = null),
-            e.target.reset());
+            await this.clearFields(e);
 
             await alert("Item Added");
           } else {
             await this.updateInCatalogue(
-              createItem(this.description, this.image, this.catalogueItem.id)
+              createItem(
+                this.description,
+                this.image,
+                this.textColor,
+                this.fontSize,
+                this.imageWidth,
+                this.catalogueItem.id
+              )
             );
             await alert("Item Updated");
           }
@@ -266,9 +296,9 @@ export default {
 
       if (!files.length) return;
 
-      const maxSize = files[0].size / 1048576;
+      const imgSize = files[0].size / 1048576;
 
-      if (maxSize > 3) {
+      if (imgSize > 3) {
         this.errors.push(errMsg);
         return;
       }
@@ -297,9 +327,10 @@ export default {
         if (!this.isItemExist) {
           return;
         }
-        await this.createImageThumb;
+        await this.createImage(this.catalogueItem.img.image);
         await this.setDescription;
         await this.setImage;
+        await this.setOptions;
       } catch (err) {
         console.log(err);
       }
@@ -515,6 +546,7 @@ img {
 }
 
 .card-preview {
+  background-color: fade-out($card-bg, 0.005);
   .card__body {
     padding: 1rem;
   }

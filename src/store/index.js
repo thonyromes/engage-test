@@ -3,7 +3,18 @@ import { createStore } from 'vuex'
 const store = createStore({
   state: { 
       catalogue: [
-        // {id: $, description: $, image: $}
+        // {
+        //   id,
+        //   desc: {
+        //     description,
+        //     textColor,
+        //     fontSize,
+        //   },
+        //   img: {
+        //     image,
+        //     imageWidth,
+        //   },
+        // }
       ]
   },
 
@@ -46,7 +57,7 @@ const store = createStore({
     updateInCatalogue(state, payload) {
       const tempCatalogue = state.catalogue.map((val) => (
         val.id === payload.item.id 
-        ? {...val, description: payload.item.description, image: payload.item.image} 
+        ? {...payload.item} 
         : val
       ));
 

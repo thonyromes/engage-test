@@ -10,14 +10,25 @@
       <div class="list-field">
         <div class="catalogue-view" v-if="isItemExist">
           <div class="align-center">
-            <img :src="imageSrc" alt="image" class="catalogue-view__image" />
+            <img
+              :src="imageSrc"
+              alt="image"
+              class="catalogue-view__image"
+              :style="{ width: catalogueItem.img.imageWidth + 'px' }"
+            />
           </div>
-          <p class="catalogue-view__desc">
-            {{ catalogueItem.description }}
+          <p
+            class="catalogue-view__desc"
+            :style="{
+              color: catalogueItem.desc.textColor,
+              fontSize: catalogueItem.desc.fontSize + 'px',
+            }"
+          >
+            {{ catalogueItem.desc.description }}
           </p>
         </div>
         <div v-else>
-          <p>No such Catalogue item!</p>
+          <p>No such Catalogue item! {{ catalogueItem }}</p>
         </div>
       </div>
     </div>
@@ -41,6 +52,10 @@ export default {
   computed: {
     ...mapGetters(["getCatalogueById"]),
 
+    getRouteId() {
+      this.routeId = this.$route.params.id;
+    },
+
     getItem() {
       this.catalogueItem = this.getCatalogueById(this.routeId);
     },
@@ -48,15 +63,13 @@ export default {
     isItemExist() {
       return this.catalogueItem ? true : false;
     },
+  },
 
-    getRouteId() {
-      this.routeId = this.$route.params.id;
-    },
-
-    createImage() {
+  methods: {
+    createImage(file) {
       const reader = new FileReader();
 
-      reader.readAsDataURL(this.catalogueItem.image);
+      reader.readAsDataURL(file);
 
       reader.onload = (e) => {
         this.imageSrc = e.target.result;
@@ -70,10 +83,9 @@ export default {
         await this.getRouteId;
         await this.getItem;
         if (!this.isItemExist) {
-          this.$router.push("/error/404");
           return;
         }
-        await this.createImage;
+        await this.createImage(this.catalogueItem.img.image);
       } catch (err) {
         console.log(err);
       }
