@@ -8,7 +8,7 @@
         >
       </div>
       <div class="list-field">
-        <ul class="catalogue" v-if="getLength > 0">
+        <ul class="catalogue" v-if="getCatalogueLength > 0">
           <li v-for="item in catalogue" :key="item.id" class="catalogue-list">
             <div class="ouput">
               <router-link
@@ -76,13 +76,9 @@ export default {
   },
 
   computed: {
-    ...mapGetters(["getCatalogue"]),
+    ...mapGetters(["getCatalogue", "getCatalogueLength"]),
 
-    getLength() {
-      return this.catalogue.length;
-    },
-
-    getList() {
+    getCatalogueList() {
       this.catalogue = this.getCatalogue;
     },
 
@@ -109,7 +105,7 @@ export default {
         this.isDeleting = true;
         try {
           await this.deleteItemById(id);
-          await this.getList;
+          await this.getCatalogueList;
           await this.createImages;
           await alert("item deleted");
         } catch (err) {
@@ -126,7 +122,7 @@ export default {
   created() {
     const asyncFun = async () => {
       try {
-        await this.getList;
+        await this.getCatalogueList;
         await this.createImages;
       } catch (err) {
         console.log(err);
