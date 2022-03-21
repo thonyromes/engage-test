@@ -61,7 +61,7 @@ export default {
     },
 
     isItemExist() {
-      return this.catalogueItem ? true : false;
+      return !!this.catalogueItem;
     },
   },
 
@@ -75,23 +75,24 @@ export default {
         this.imageSrc = e.target.result;
       };
     },
+
+    goto404() {
+      this.$router.push("/not-found");
+    },
   },
 
   created() {
-    const asyncFun = async () => {
-      try {
-        await this.getRouteId;
-        await this.getItem;
-        if (!this.isItemExist) {
-          return;
-        }
-        await this.createImage(this.catalogueItem.img.image);
-      } catch (err) {
-        console.log(err);
+    try {
+      this.getRouteId;
+      this.getItem;
+      if (!this.isItemExist) {
+        this.goto404();
+        return;
       }
-    };
-
-    asyncFun();
+      this.createImage(this.catalogueItem.img.image);
+    } catch (err) {
+      console.log(err);
+    }
   },
 };
 </script>

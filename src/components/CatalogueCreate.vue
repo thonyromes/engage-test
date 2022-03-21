@@ -192,20 +192,20 @@ export default {
   computed: {
     ...mapGetters(["getCatalogueById"]),
 
-    getItem() {
-      this.catalogueItem = this.getCatalogueById(this.routeId);
-    },
-
     getRouteId() {
       this.routeId = this.$route.params.id;
     },
 
+    getItem() {
+      this.catalogueItem = this.getCatalogueById(this.routeId);
+    },
+
     isEditing() {
-      return this.routeId ? true : false;
+      return !!this.routeId;
     },
 
     isItemExist() {
-      return this.catalogueItem ? true : false;
+      return !!this.catalogueItem;
     },
 
     setDescription() {
@@ -234,62 +234,58 @@ export default {
     },
 
     saveItem(e) {
-      const asynFun = async () => {
-        this.isSaving = true;
-        this.errors = [];
+      this.isSaving = true;
+      this.errors = [];
 
-        try {
-          if (!this.description) {
-            this.errors.push("Description is required");
-          }
-
-          if (!this.imageSrc) {
-            this.errors.push("Image is required");
-          }
-
-          if (this.errors.length > 0) {
-            return;
-          }
-
-          if (!this.isEditing) {
-            await this.addToCatalogue(
-              createItem(
-                this.description,
-                this.image,
-                this.textColor,
-                this.fontSize,
-                this.imageWidth
-              )
-            );
-
-            await this.clearFields(e);
-
-            await alert("Item Added");
-          } else {
-            await this.updateInCatalogue(
-              createItem(
-                this.description,
-                this.image,
-                this.textColor,
-                this.fontSize,
-                this.imageWidth,
-                this.catalogueItem.id
-              )
-            );
-            await alert("Item Updated");
-          }
-        } catch (err) {
-          console.log(err);
-        } finally {
-          await (this.isSaving = false);
+      try {
+        if (!this.description) {
+          this.errors.push("Description is required");
         }
-      };
 
-      asynFun();
+        if (!this.imageSrc) {
+          this.errors.push("Image is required");
+        }
+
+        if (this.errors.length > 0) {
+          return;
+        }
+
+        if (!this.isEditing) {
+          this.addToCatalogue(
+            createItem(
+              this.description,
+              this.image,
+              this.textColor,
+              this.fontSize,
+              this.imageWidth
+            )
+          );
+
+          this.clearFields(e);
+
+          alert("Item Added");
+        } else {
+          this.updateInCatalogue(
+            createItem(
+              this.description,
+              this.image,
+              this.textColor,
+              this.fontSize,
+              this.imageWidth,
+              this.catalogueItem.id
+            )
+          );
+          alert("Item Updated");
+        }
+      } catch (err) {
+        console.log(err);
+      } finally {
+        this.isSaving = false;
+      }
     },
 
     onFileChange(e) {
-      const errMsg = "Image is too large (less than 3MB)";
+      const errMsg = "Image is too large (it should be less than 3MB)";
       this.errors = this.errors.filter((val) => val !== errMsg);
 
       const files = e.target.files || e.dataTransfer.files;
@@ -320,23 +316,19 @@ export default {
   },
 
   created() {
-    const asyncFun = async () => {
-      try {
-        await this.getRouteId;
-        await this.getItem;
-        if (!this.isItemExist) {
-          return;
-        }
-        await this.createImage(this.catalogueItem.img.image);
-        await this.setDescription;
-        await this.setImage;
-        await this.setOptions;
-      } catch (err) {
-        console.log(err);
+    try {
+      this.getRouteId;
+      this.getItem;
+      if (!this.isItemExist) {
+        return;
       }
-    };
-
-    asyncFun();
+      this.createImage(this.catalogueItem.img.image);
+      this.setDescription;
+      this.setImage;
+      this.setOptions;
+    } catch (err) {
+      console.log(err);
+    }
   },
 };
 </script>

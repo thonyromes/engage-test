@@ -10,7 +10,7 @@
       <div class="list-field">
         <ul class="catalogue" v-if="getCatalogueLength > 0">
           <li v-for="item in catalogue" :key="item.id" class="catalogue-list">
-            <div class="ouput">
+            <div class="output">
               <router-link
                 :to="{ name: 'Details', params: { id: item.id } }"
                 class="catalogue-item"
@@ -31,7 +31,7 @@
                 </p>
               </router-link>
             </div>
-            <div class="operations">
+            <div class="actions">
               <router-link
                 :to="{ name: 'Details', params: { id: item.id } }"
                 class="btn btn--sm btn--primary mx-1"
@@ -101,35 +101,27 @@ export default {
     ...mapMutations(["deleteItemById"]),
 
     deleteItem(id) {
-      const asyncFun = async () => {
-        this.isDeleting = true;
-        try {
-          await this.deleteItemById(id);
-          await this.getCatalogueList;
-          await this.createImages;
-          await alert("item deleted");
-        } catch (err) {
-          console.log(err);
-        } finally {
-          await (this.isDeleting = false);
-        }
-      };
-
-      asyncFun();
+      this.isDeleting = true;
+      try {
+        this.deleteItemById(id);
+        this.getCatalogueList;
+        this.createImages;
+        alert("item deleted");
+      } catch (err) {
+        console.log(err);
+      } finally {
+        this.isDeleting = false;
+      }
     },
   },
 
   created() {
-    const asyncFun = async () => {
-      try {
-        await this.getCatalogueList;
-        await this.createImages;
-      } catch (err) {
-        console.log(err);
-      }
-    };
-
-    asyncFun();
+    try {
+      this.getCatalogueList;
+      this.createImages;
+    } catch (err) {
+      console.log(err);
+    }
   },
 };
 </script>
@@ -241,7 +233,7 @@ img {
       width: auto;
     }
 
-    .operations {
+    .actions {
       flex: 0 0 6rem;
       width: 6rem;
       margin-left: auto;
